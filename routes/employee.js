@@ -6,10 +6,11 @@ import {
   getEmployee,
   updateEmployee,
 } from "../controllers/employee.js";
+import { privateRoutes } from "../middleware/private.js";
 
 const router = express.Router();
 
-router.get("/employee", getEmployee);
+router.get("/employee", privateRoutes, getEmployee);
 router.post("/employee", multer, addEmployee);
 router.patch("/updateEmployee/:id", multer, updateEmployee);
 router.patch("/employee/:id", deleteEmployee);

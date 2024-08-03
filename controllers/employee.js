@@ -15,7 +15,14 @@ export const getEmployee = async (req, res) => {
 export const addEmployee = async (req, res) => {
   const { name, position, noSk } = req.body;
   try {
-    if (name === "" || position === "" || noSk === "") {
+    if (
+      name === "" ||
+      position === "" ||
+      noSk === "" ||
+      name === undefined ||
+      position === undefined ||
+      noSk === undefined
+    ) {
       return res.status(400).json("Invalid data!");
     }
 

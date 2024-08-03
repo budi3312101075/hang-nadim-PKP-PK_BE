@@ -74,20 +74,13 @@ export const login = async (req, res) => {
     }
 
     const user = await query(
-      `SELECT u.username, u.is_admin, e.name, e.position,e.photo,e.no_sk FROM 
-      user u INNER JOIN employee e 
-      ON u.id_employee = e.uuid 
-      WHERE u.username = ? AND u.is_deleted = 0`,
+      `SELECT uuid, id_employee as idEmployee FROM user WHERE username = "budi" AND is_deleted = 0`,
       [username]
     );
 
     const payload = {
-      username: user[0].username,
-      is_admin: user[0].is_admin,
-      name: user[0].name,
-      position: user[0].position,
-      photo: user[0].photo,
-      no_sk: user[0].no_sk,
+      idUser: user[0].uuid,
+      idEmployee: user[0].idEmployee,
     };
     const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: "1d",
@@ -101,6 +94,17 @@ export const login = async (req, res) => {
       .status(200)
       .cookie("token", token, options)
       .json({ success: true, data: token });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+};
+
+export const Logout = async (req, res) => {
+  try {
+    res
+      .status(200)
+      .clearCookie("token")
+      .json({ success: true, msg: "Logout Berhasil!" });
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
