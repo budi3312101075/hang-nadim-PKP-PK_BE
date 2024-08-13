@@ -18,7 +18,7 @@ export const privateRoutes = async (req, res, next) => {
       WHERE u.uuid = ?  AND u.is_deleted = 0`,
       [decoded.idUser]
     );
-    req.user = userDetail;
+    req.user = userDetail[0];
     next();
   } catch (error) {
     res.status(500).json({ success: false, msg: error.message });

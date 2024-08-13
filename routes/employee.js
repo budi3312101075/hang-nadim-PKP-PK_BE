@@ -13,6 +13,6 @@ const router = express.Router();
 router.get("/employee", privateRoutes, getEmployee);
 router.post("/employee", multer, addEmployee);
 router.patch("/updateEmployee/:id", multer, updateEmployee);
-router.patch("/employee/:id", deleteEmployee);
+router.delete("/employee/:id", deleteEmployee);
 
 export default router;
