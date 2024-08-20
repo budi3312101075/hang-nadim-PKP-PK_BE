@@ -74,13 +74,14 @@ export const login = async (req, res) => {
     }
 
     const user = await query(
-      `SELECT uuid, id_employee as idEmployee FROM user WHERE username = ? AND is_deleted = 0`,
+      `SELECT uuid, id_employee as idEmployee, is_admin FROM user WHERE username = ? AND is_deleted = 0`,
       [username]
     );
 
     const payload = {
       idUser: user[0].uuid,
       idEmployee: user[0].idEmployee,
+      role: user[0].is_admin,
     };
     const token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: "1d",
@@ -94,6 +95,23 @@ export const login = async (req, res) => {
       .status(200)
       .cookie("token", token, options)
       .json({ success: true, data: token });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+};
+
+export const getMe = async (req, res) => {
+  const { uuid } = req.user;
+  try {
+    const [getMe] = await query(
+      `SELECT u.uuid, u.username, u.is_admin , e.name, e.position,e.photo,e.no_sk FROM 
+      user u INNER JOIN employee e 
+      ON u.id_employee = e.uuid 
+      WHERE u.uuid = ?  AND u.is_deleted = 0`,
+      [uuid]
+    );
+
+    return res.status(200).json({ success: true, getMe });
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
