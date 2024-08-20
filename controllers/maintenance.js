@@ -6,11 +6,32 @@ dayjs.extend(isBetween);
 
 export const getMaintenance = async (req, res) => {
   try {
-    const data = await query(
-      `SELECT m.uuid as id, c.name, c.type, c.photo, m.type as jenisPerbaikan, m.description, m.date_in, m.date_out 
-      FROM maintenance m INNER JOIN car c 
-      ON m.id_car = c.uuid WHERE m.is_deleted = 0`
-    );
+    const data = await query(`
+      SELECT 
+        c.uuid as carId, 
+        c.name, 
+        c.type, 
+        c.photo,
+        JSON_ARRAYAGG(
+          JSON_OBJECT(
+            'jenisPerbaikan', m.type, 
+            'description', m.description, 
+            'date_in', m.date_in, 
+            'date_out', m.date_out
+          )
+        ) as maintenanceRecords
+      FROM 
+        maintenance m 
+      INNER JOIN 
+        car c 
+      ON 
+        m.id_car = c.uuid 
+      WHERE 
+        m.is_deleted = 0
+      GROUP BY 
+        c.uuid, c.name, c.type, c.photo
+    `);
+
     return res.status(200).json(data);
   } catch (error) {
     return res.status(400).json({ message: error.message });

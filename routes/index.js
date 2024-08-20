@@ -1,8 +1,8 @@
 import express from "express";
-import employee from "./employee.js";
-import auth from "./auth.js";
-import car from "./car.js";
-import maintenance from "./maintenance.js";
+import employee from "./api/employee.js";
+import auth from "./api/auth.js";
+import car from "./api/car.js";
+import maintenance from "./api/maintenance.js";
 
 const app = express();
 

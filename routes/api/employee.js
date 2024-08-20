@@ -1,12 +1,12 @@
 import express from "express";
-import multer from "../middleware/multer.js";
+import multer from "../../middleware/multer.js";
 import {
   addEmployee,
   deleteEmployee,
   getEmployee,
   updateEmployee,
-} from "../controllers/employee.js";
-import { privateRoutes } from "../middleware/private.js";
+} from "../../controllers/employee.js";
+import { privateRoutes } from "../../middleware/private.js";
 
 const router = express.Router();
 

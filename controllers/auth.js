@@ -74,7 +74,7 @@ export const login = async (req, res) => {
     }
 
     const user = await query(
-      `SELECT uuid, id_employee as idEmployee FROM user WHERE username = "budi" AND is_deleted = 0`,
+      `SELECT uuid, id_employee as idEmployee FROM user WHERE username = ? AND is_deleted = 0`,
       [username]
     );
 

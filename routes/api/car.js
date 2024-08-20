@@ -1,6 +1,6 @@
 import express from "express";
-import multer from "../middleware/multer.js";
-import { getCar, addCar, updateCar, deleteCar } from "../controllers/car.js";
+import multer from "../../middleware/multer.js";
+import { getCar, addCar, updateCar, deleteCar } from "../../controllers/car.js";
 
 const router = express.Router();
 
