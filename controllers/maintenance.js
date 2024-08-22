@@ -14,6 +14,7 @@ export const getMaintenance = async (req, res) => {
         c.photo,
         JSON_ARRAYAGG(
           JSON_OBJECT(
+            'id', m.uuid,
             'jenisPerbaikan', m.type, 
             'description', m.description, 
             'date_in', m.date_in, 
