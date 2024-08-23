@@ -28,7 +28,7 @@ export const getMaintenance = async (req, res) => {
       ON 
         m.id_car = c.uuid 
       WHERE 
-        m.is_deleted = 0
+        m.is_deleted = 0 AND c.is_deleted = 0
       GROUP BY 
         c.uuid, c.name, c.type, c.photo
     `);
