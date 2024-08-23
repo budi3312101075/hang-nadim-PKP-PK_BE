@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.get("/maintenance", privateRoutes, getMaintenance);
 router.post("/maintenance", privateRoutes, addMaintenance);
-router.patch("/updateMaintenance/:id", privateRoutes, updateMaintenance);
+router.patch("/maintenance/:id", privateRoutes, updateMaintenance);
 router.delete("/maintenance/:id", privateRoutes, deleteMaintenance);
 
 export default router;

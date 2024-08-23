@@ -69,7 +69,7 @@ export const addMaintenance = async (req, res) => {
         currentDate.isBetween(dayjsLastDateIn, dayjsLastDateOut, "day", "[)")
       ) {
         return res.status(400).json({
-          message: "the car is being repaired",
+          message: "Mobil sedang dalam perbaikan",
           data: { currentDate, dayjsLastDateIn, dayjsLastDateOut },
         });
       }
@@ -93,7 +93,9 @@ export const addMaintenance = async (req, res) => {
       ]
     );
 
-    return res.status(200).json({ message: "Maintenance added successfully" });
+    return res
+      .status(200)
+      .json({ message: "Maintenance berhasil ditambahkan" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
