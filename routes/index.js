@@ -4,6 +4,7 @@ import auth from "./api/auth.js";
 import car from "./api/car.js";
 import maintenance from "./api/maintenance.js";
 import news from "./api/news.js";
+import users from "./api/users.js";
 
 const app = express();
 
@@ -14,5 +15,6 @@ app.use(api, auth);
 app.use(api, car);
 app.use(api, maintenance);
 app.use(api, news);
+app.use(api, users);
 
 export default app;

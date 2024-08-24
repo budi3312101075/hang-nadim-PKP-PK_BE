@@ -98,6 +98,25 @@ export const updateEmployee = async (req, res) => {
 export const deleteEmployee = async (req, res) => {
   const { id } = req.params;
   try {
+    const cekUser = await query(
+      `SELECT id_employee FROM user WHERE id_employee = ? AND is_deleted = 0`,
+      [id]
+    );
+
+    if (cekUser.length > 0) {
+      await query(
+        `UPDATE user SET is_deleted = 1, updated_at = ? WHERE id_employee = ?`,
+        [dateValue(), cekUser[0].id_employee]
+      );
+      await query(
+        `UPDATE employee SET is_deleted = 1, updated_at = ? WHERE uuid = ?`,
+        [dateValue(), id]
+      );
+      return res
+        .status(200)
+        .json({ message: "data user and employee successfully deleted" });
+    }
+
     await query(
       `UPDATE employee SET is_deleted = 1, updated_at = ? WHERE uuid = ?`,
       [dateValue(), id]

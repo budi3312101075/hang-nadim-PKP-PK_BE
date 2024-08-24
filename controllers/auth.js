@@ -1,65 +1,6 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { query } from "../utils/query.js";
-import { dateValue, uuid } from "../utils/tools.cjs";
-
-export const register = async (req, res) => {
-  const { username, password, isAdmin, idEmployee } = req.body;
-  try {
-    if (
-      username === undefined ||
-      password === undefined ||
-      isAdmin === undefined ||
-      idEmployee === undefined ||
-      username === "" ||
-      password === "" ||
-      idEmployee === ""
-    ) {
-      return res.status(400).json("Invalid data!");
-    }
-
-    const isUserExist = await query(
-      `SELECT username FROM user WHERE username = ? AND is_deleted = 0`,
-      [username]
-    );
-
-    const isEmployee = await query(
-      `SELECT id_employee FROM user WHERE id_employee = ? AND is_deleted = 0`,
-      [idEmployee]
-    );
-
-    if (isEmployee.length > 0) {
-      return res.status(400).json("Employees already have accounts!");
-    }
-
-    if (isUserExist.length > 0) {
-      return res.status(400).json("Username already exist!");
-    } else {
-      const salt = await bcrypt.genSalt();
-      const hashedPassword = await bcrypt.hash(password, salt);
-
-      await query(
-        `INSERT INTO user 
-        (uuid, username, password, is_admin, is_deleted, id_employee, created_at, updated_at) values 
-        (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          uuid(),
-          username,
-          hashedPassword,
-          isAdmin,
-          0,
-          idEmployee,
-          dateValue(),
-          dateValue(),
-        ]
-      );
-
-      return res.status(200).json({ message: "data successfully added" });
-    }
-  } catch (error) {
-    return res.status(400).json({ message: error.message });
-  }
-};
 
 export const login = async (req, res) => {
   const { username, password } = req.body;
@@ -69,17 +10,26 @@ export const login = async (req, res) => {
     }
 
     const cekUser = await query(
-      `SELECT username ,password FROM user WHERE username = ? AND is_deleted = 0`,
+      `SELECT username, password, id_employee FROM user WHERE username = ? AND is_deleted = 0`,
       [username]
     );
 
     if (cekUser.length === 0) {
-      return res.status(400).json("Username not found!");
+      return res.status(400).json("Username tidak ditemukan!");
     }
 
     const isPasswordMatch = await bcrypt.compare(password, cekUser[0].password);
     if (!isPasswordMatch) {
-      return res.status(400).json({ msg: "Password wrong" });
+      return res.status(400).json("Password Salah");
+    }
+
+    const cekEmploye = await query(
+      `SELECT uuid FROM employee WHERE uuid = ? AND is_deleted = 0`,
+      [cekUser[0].id_employee]
+    );
+
+    if (cekEmploye.length === 0) {
+      return res.status(400).json("Anda Bukan Karyawan");
     }
 
     const user = await query(
