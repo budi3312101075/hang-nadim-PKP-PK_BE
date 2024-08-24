@@ -23,6 +23,15 @@ export const register = async (req, res) => {
       [username]
     );
 
+    const isEmployee = await query(
+      `SELECT id_employee FROM user WHERE id_employee = ? AND is_deleted = 0`,
+      [idEmployee]
+    );
+
+    if (isEmployee.length > 0) {
+      return res.status(400).json("Employees already have accounts!");
+    }
+
     if (isUserExist.length > 0) {
       return res.status(400).json("Username already exist!");
     } else {

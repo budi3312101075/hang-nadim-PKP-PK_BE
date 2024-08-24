@@ -4,7 +4,7 @@ import { dateValue, uuid } from "../utils/tools.cjs";
 export const getEmployee = async (req, res) => {
   try {
     const data = await query(
-      `SELECT uuid as id, name, position, photo, no_sk FROM employee WHERE is_deleted = 0`
+      `SELECT uuid as id, name, position, division, photo, no_sk FROM employee WHERE is_deleted = 0`
     );
     return res.status(200).json(data);
   } catch (error) {
@@ -13,14 +13,16 @@ export const getEmployee = async (req, res) => {
 };
 
 export const addEmployee = async (req, res) => {
-  const { name, position, noSk } = req.body;
+  const { name, position, division, noSk } = req.body;
   try {
     if (
       name === "" ||
       position === "" ||
+      division === "" ||
       noSk === "" ||
       name === undefined ||
       position === undefined ||
+      division === undefined ||
       noSk === undefined
     ) {
       return res.status(400).json("Invalid data!");
@@ -37,8 +39,18 @@ export const addEmployee = async (req, res) => {
     }
 
     await query(
-      `INSERT INTO employee (uuid, name, position, photo, no_sk, is_deleted, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [uuid(), name, position, photo, noSk, 0, dateValue(), dateValue()]
+      `INSERT INTO employee (uuid, name, position, division, photo, no_sk, is_deleted, created_at, updated_at) VALUES (?, ?, ?, ?,?, ?, ?, ?, ?)`,
+      [
+        uuid(),
+        name,
+        position,
+        division,
+        photo,
+        noSk,
+        0,
+        dateValue(),
+        dateValue(),
+      ]
     );
     return res.status(200).json({ message: "data successfully added" });
   } catch (error) {
@@ -47,17 +59,22 @@ export const addEmployee = async (req, res) => {
 };
 
 export const updateEmployee = async (req, res) => {
-  const { name, position, noSk } = req.body;
+  const { name, position, division, noSk } = req.body;
   const { id } = req.params;
   try {
-    if (name === undefined || position === undefined || noSk === undefined) {
+    if (
+      name === undefined ||
+      position === undefined ||
+      division === undefined ||
+      noSk === undefined
+    ) {
       return res.status(400).json("Invalid data!");
     }
 
     if (req.file === undefined) {
       await query(
-        `UPDATE employee SET name = ?, position = ?, no_sk = ?, updated_at = ? WHERE uuid = ?`,
-        [name, position, noSk, dateValue(), id]
+        `UPDATE employee SET name = ?, position = ?, division = ?, no_sk = ?, updated_at = ? WHERE uuid = ?`,
+        [name, position, division, noSk, dateValue(), id]
       );
 
       return res.status(200).json({ message: "data successfully updated" });
@@ -68,8 +85,8 @@ export const updateEmployee = async (req, res) => {
         return res.status(422).json({ msg: "Image must be smaller than 5MB" });
       }
       await query(
-        `UPDATE employee SET name = ?, position = ?, no_sk = ?, photo = ?, updated_at = ? WHERE uuid = ?`,
-        [name, position, noSk, photo, dateValue(), id]
+        `UPDATE employee SET name = ?, position = ?, division = ?, no_sk = ?, photo = ?, updated_at = ? WHERE uuid = ?`,
+        [name, position, division, noSk, photo, dateValue(), id]
       );
       return res.status(200).json({ message: "data successfully updated" });
     }
