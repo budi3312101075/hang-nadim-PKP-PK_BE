@@ -6,7 +6,22 @@ export const getEmployee = async (req, res) => {
     const data = await query(
       `SELECT uuid as id, name, position, division, photo, no_sk FROM employee WHERE is_deleted = 0`
     );
-    return res.status(200).json(data);
+
+    const bravo = await query(
+      `SELECT uuid as id, name, position, division, photo, no_sk FROM employee WHERE division = 'bravo' AND is_deleted = 0`
+    );
+
+    const charlie = await query(
+      `SELECT uuid as id, name, position, division, photo, no_sk FROM employee WHERE division = 'charlie' AND is_deleted = 0`
+    );
+
+    const alpha = await query(
+      `SELECT uuid as id, name, position, division, photo, no_sk FROM employee WHERE division = 'alpha' AND is_deleted = 0`
+    );
+
+    return res
+      .status(200)
+      .json({ data: data, bravo: bravo, charlie: charlie, alpha: alpha });
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }

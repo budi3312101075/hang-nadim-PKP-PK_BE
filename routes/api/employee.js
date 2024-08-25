@@ -10,9 +10,9 @@ import { privateRoutes } from "../../middleware/private.js";
 
 const router = express.Router();
 
-router.get("/employee", privateRoutes, getEmployee);
-router.post("/employee", multer, addEmployee);
-router.patch("/employee/:id", multer, updateEmployee);
-router.delete("/employee/:id", deleteEmployee);
+router.get("/employee", getEmployee);
+router.post("/employee", privateRoutes, multer, addEmployee);
+router.patch("/employee/:id", privateRoutes, multer, updateEmployee);
+router.delete("/employee/:id", privateRoutes, deleteEmployee);
 
 export default router;
