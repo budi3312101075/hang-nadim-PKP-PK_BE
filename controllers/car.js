@@ -1,5 +1,6 @@
 import { query } from "../utils/query.js";
 import { dateValue, uuid } from "../utils/tools.cjs";
+import imagekit from "../middleware/imageKit.js";
 
 export const getCar = async (req, res) => {
   try {
@@ -23,15 +24,21 @@ export const addCar = async (req, res) => {
       return res.status(400).json({ msg: "No file uploaded" });
     }
 
-    const { filename: photo, size } = req.file;
+    const { buffer, originalname, size } = req.file;
     const fileSize = size;
     if (fileSize > 5000000) {
       return res.status(422).json({ msg: "Image must be smaller than 5MB" });
     }
 
+    const result = await imagekit.upload({
+      file: buffer, // Buffer dari file yang di-upload
+      fileName: originalname, // Nama file yang di-upload
+      folder: "Hangnadim",
+    });
+
     await query(
       `INSERT INTO car (uuid, name, type, photo, is_deleted, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [uuid(), name, type, photo, 0, dateValue(), dateValue()]
+      [uuid(), name, type, result.url, 0, dateValue(), dateValue()]
     );
 
     return res.status(200).json({ message: "data successfully added" });
@@ -55,15 +62,20 @@ export const updateCar = async (req, res) => {
       );
       return res.status(200).json({ message: "data successfully updated" });
     } else {
-      const { filename: photo, size } = req.file;
+      const { buffer, originalname, size } = req.file;
       const fileSize = size;
       if (fileSize > 5000000) {
         return res.status(422).json({ msg: "Image must be smaller than 5MB" });
       }
+      const result = await imagekit.upload({
+        file: buffer, // Buffer dari file yang di-upload
+        fileName: originalname, // Nama file yang di-upload
+        folder: "Hangnadim",
+      });
 
       await query(
         `UPDATE car SET name = ?, type = ?, photo = ?, updated_at = ? WHERE uuid = ?`,
-        [name, type, photo, dateValue(), id]
+        [name, type, result.url, dateValue(), id]
       );
       return res.status(200).json({ message: "data successfully updated" });
     }

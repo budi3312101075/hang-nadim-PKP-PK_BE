@@ -1,3 +1,4 @@
+import imagekit from "../middleware/imageKit.js";
 import { query } from "../utils/query.js";
 import { dateValue, uuid } from "../utils/tools.cjs";
 
@@ -47,11 +48,17 @@ export const addEmployee = async (req, res) => {
       return res.status(400).json({ msg: "No file uploaded" });
     }
 
-    const { filename: photo, size } = req.file;
+    const { buffer, originalname, size } = req.file;
     const fileSize = size;
     if (fileSize > 5000000) {
       return res.status(422).json({ msg: "Image must be smaller than 5MB" });
     }
+
+    const result = await imagekit.upload({
+      file: buffer, // Buffer dari file yang di-upload
+      fileName: originalname, // Nama file yang di-upload
+      folder: "Hangnadim",
+    });
 
     await query(
       `INSERT INTO employee (uuid, name, position, division, photo, no_sk, is_deleted, created_at, updated_at) VALUES (?, ?, ?, ?,?, ?, ?, ?, ?)`,
@@ -60,7 +67,7 @@ export const addEmployee = async (req, res) => {
         name,
         position,
         division,
-        photo,
+        result.url,
         noSk,
         0,
         dateValue(),
@@ -94,14 +101,21 @@ export const updateEmployee = async (req, res) => {
 
       return res.status(200).json({ message: "data successfully updated" });
     } else {
-      const { filename: photo, size } = req.file;
+      const { buffer, originalname, size } = req.file;
       const fileSize = size;
       if (fileSize > 5000000) {
         return res.status(422).json({ msg: "Image must be smaller than 5MB" });
       }
+
+      const result = await imagekit.upload({
+        file: buffer, // Buffer dari file yang di-upload
+        fileName: originalname, // Nama file yang di-upload
+        folder: "Hangnadim",
+      });
+
       await query(
         `UPDATE employee SET name = ?, position = ?, division = ?, no_sk = ?, photo = ?, updated_at = ? WHERE uuid = ?`,
-        [name, position, division, noSk, photo, dateValue(), id]
+        [name, position, division, noSk, result.url, dateValue(), id]
       );
       return res.status(200).json({ message: "data successfully updated" });
     }
