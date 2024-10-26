@@ -16,32 +16,25 @@ export const getCar = async (req, res) => {
 export const addCar = async (req, res) => {
   const { name, type } = req.body;
   try {
-    if (name === undefined || type === undefined) {
+    if (!name || !type) {
       return res.status(400).json("Invalid data!");
     }
 
-    if (req.file === undefined) {
+    if (!req.file) {
       return res.status(400).json({ msg: "No file uploaded" });
     }
 
-    const { buffer, originalname, size } = req.file;
-    const fileSize = size;
-    if (fileSize > 5000000) {
+    const { filename: photo, size } = req.file;
+    if (size > 5000000) {
       return res.status(422).json({ msg: "Image must be smaller than 5MB" });
     }
 
-    const result = await imagekit.upload({
-      file: buffer, // Buffer dari file yang di-upload
-      fileName: originalname, // Nama file yang di-upload
-      folder: "Hangnadim",
-    });
-
     await query(
       `INSERT INTO car (uuid, name, type, photo, is_deleted, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [uuid(), name, type, result.url, 0, dateValue(), dateValue()]
+      [uuid(), name, type, photo, 0, dateValue(), dateValue()]
     );
 
-    return res.status(200).json({ message: "data successfully added" });
+    return res.status(200).json({ message: "Data successfully added" });
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
@@ -62,20 +55,19 @@ export const updateCar = async (req, res) => {
       );
       return res.status(200).json({ message: "data successfully updated" });
     } else {
-      const { buffer, originalname, size } = req.file;
-      const fileSize = size;
-      if (fileSize > 5000000) {
+      const { filename: photo, size } = req.file;
+      if (size > 5000000) {
         return res.status(422).json({ msg: "Image must be smaller than 5MB" });
       }
-      const result = await imagekit.upload({
-        file: buffer, // Buffer dari file yang di-upload
-        fileName: originalname, // Nama file yang di-upload
-        folder: "Hangnadim",
-      });
+      // const result = await imagekit.upload({
+      //   file: buffer, // Buffer dari file yang di-upload
+      //   fileName: originalname, // Nama file yang di-upload
+      //   folder: "Hangnadim",
+      // });
 
       await query(
         `UPDATE car SET name = ?, type = ?, photo = ?, updated_at = ? WHERE uuid = ?`,
-        [name, type, result.url, dateValue(), id]
+        [name, type, photo, dateValue(), id]
       );
       return res.status(200).json({ message: "data successfully updated" });
     }
